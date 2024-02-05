@@ -133,18 +133,44 @@
                             <thead
                                 class="bg-gray-50 text-xs uppercase text-gray-700 dark:bg-gray-700 dark:text-gray-400">
                                 <tr>
-                                    <th scope="col" class="px-4 py-3">ID</th>
-                                    <th scope="col" class="px-4 py-3">Title</th>
-                                    <th scope="col" class="px-4 py-3">Description</th>
-                                    <th scope="col" class="px-4 py-3">Price</th>
-                                    <th scope="col" class="px-4 py-3">Category</th>
+                                    <th scope="col" class="px-4 py-3">
+                                        <button
+                                            class="flex items-center rounded px-2 py-1 leading-tight transition-colors hover:bg-gray-200/50 hover:shadow">
+                                            ID
+                                        </button>
+                                    </th>
+                                    <th scope="col" class="px-4 py-3">
+                                        <button
+                                            class="flex items-center rounded px-2 py-1 leading-tight transition-colors hover:bg-gray-200/50 hover:shadow">
+                                            Title
+                                        </button>
+                                    </th>
+                                    <th scope="col" class="px-4 py-3">
+                                        <button
+                                            class="flex items-center rounded px-2 py-1 leading-tight transition-colors hover:bg-gray-200/50 hover:shadow">
+                                            Description
+                                        </button>
+                                    </th>
+                                    <th scope="col" class="px-4 py-3">
+                                        <button
+                                            wire:click="sortBy('price')"
+                                            class="flex items-center rounded px-2 py-1 leading-tight transition-colors hover:bg-gray-200/50 hover:shadow">
+                                            Price
+                                        </button>
+                                    </th>
+                                    <th scope="col" class="px-4 py-3">
+                                        <button
+                                            class="flex items-center rounded px-2 py-1 leading-tight transition-colors hover:bg-gray-200/50 hover:shadow">
+                                            Category
+                                        </button>
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach ($products as $product)
                                     <tr class="border-b dark:border-gray-700">
-                                        <th scope="row"
-                                            class="whitespace-nowrap px-4 py-3 font-medium text-gray-900 dark:text-white">
+                                        <th
+                                            scope="row"class="whitespace-nowrap px-4 py-3 font-medium text-gray-900 dark:text-white">
                                             {{ $product['id'] }}</th>
                                         <td class="px-4 py-3">{{ $product['title'] }}</td>
                                         <td class="px-4 py-3">{{ $product['description'] }}</td>
@@ -160,9 +186,12 @@
                         aria-label="Table navigation">
                         <span class="text-sm font-normal text-gray-500 dark:text-gray-400">
                             Showing
-                            <span class="font-semibold text-gray-900 dark:text-white">1-10</span>
+                            <span class="font-semibold text-gray-900 dark:text-white">{{ ($page - 1) * 5 + 1 }}</span>
+                            -
+                            <span
+                                class="font-semibold text-gray-900 dark:text-white">{{ min($page * 5, count($allProducts)) }}</span>
                             of
-                            <span class="font-semibold text-gray-900 dark:text-white">1000</span>
+                            <span class="font-semibold text-gray-900 dark:text-white">{{ count($allProducts) }}</span>
                         </span>
                         <ul class="inline-flex items-stretch -space-x-px">
                             <!-- Previous Page Link -->
