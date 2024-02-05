@@ -3,7 +3,7 @@
 namespace App\Livewire;
 
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
+use Livewire\Attributes\On;
 use Livewire\Component;
 
 class Products extends Component
@@ -16,7 +16,7 @@ class Products extends Component
         'actions' => false,
         'filter' => false,
     ];
-    public int $clickCount;
+    public int $clickCount = 0;
     public string $sortField = '';
     public ?bool $sortAsc = true;
 
@@ -55,15 +55,24 @@ class Products extends Component
 
     public function loadPage()
     {
+        // Filtrar os produtos com base na busca
+        $filteredProducts = collect($this->allProducts)->filter(function ($product) {
+            return stripos($product['id'], $this->search) !== false ||
+                stripos($product['title'], $this->search) !== false ||
+                stripos($product['description'], $this->search) !== false ||
+                stripos($product['price'], $this->search) !== false ||
+                stripos($product['category'], $this->search) !== false;
+        })->toArray();
+
+        // Ordenar os produtos filtrados, se necessário
         if ($this->sortField != '') {
-            $this->allProducts = collect($this->allProducts)->sortBy(function ($product) {
+            $filteredProducts = collect($filteredProducts)->sortBy(function ($product) {
                 return floatval($product[$this->sortField]);
             }, SORT_REGULAR, $this->sortAsc)->toArray();
-        } else {
-            $response = Http::get('https://dummyjson.com/products')->json();
-            $this->allProducts = $response['products'];
         }
-        $this->products = array_slice($this->allProducts, ($this->page - 1) * 5, 5);
+
+        // Atualizar a propriedade $products com uma fatia dos produtos filtrados
+        $this->products = array_slice($filteredProducts, ($this->page - 1) * 5, 5);
     }
 
 
@@ -73,17 +82,11 @@ class Products extends Component
         $this->loadPage();
     }
 
-    public function updatingSearch()
+    #[On('searchUpdated')]
+    public function updatingSearch($search)
     {
-        $response = Http::get('https://dummyjson.com/products')->json();
-        $this->allProducts = collect($response['products'])->filter(function ($product) {
-            return str_contains(strtolower($product['id']), strtolower($this->search)) ||
-                str_contains(strtolower($product['title']), strtolower($this->search)) ||
-                str_contains(strtolower($product['description']), strtolower($this->search)) ||
-                str_contains(strtolower($product['price']), strtolower($this->search)) ||
-                str_contains(strtolower($product['category']), strtolower($this->search));
-        })->toArray();
-        $this->goToPage(1);
+        $this->search = $search;
+        $this->loadPage();
     }
 
     public function render()
